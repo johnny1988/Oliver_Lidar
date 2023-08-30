@@ -14,51 +14,95 @@ https://de.aliexpress.com/item/33035807395.html?gatewayAdapt=glo2deu
  * 
 */
 //include <HardwareSerial.h> // ist bereits teil von Arduino IDE
+#include <MPU6050_tockn.h>
+#include <Wire.h>
 
+MPU6050 mpu6050(Wire);
 #define RXD1 27  // for loopback jumper these pins
 #define TXD1 26
 
 #define RXD2 16
 #define TXD2 17
- int array [] = {0x01, 0x03, 0x00, 0x0f, 0x00, 0x02, 0xf4, 0x08};
+int array[] = { 0x01, 0x03, 0x00, 0x0f, 0x00, 0x02, 0xf4, 0x08 };
+int Lidar1[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+int Lidar2[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-void setup() 
-{
-    // Note the format for setting a serial port is as follows: Serial2.begin(baud-rate, protocol, RX pin, TX pin);
-    Serial.begin(115200);
-    
-    Serial1.begin(9600, SERIAL_8N1, RXD1, TXD1);
-    Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
+float AngleX = 0;
+float AngleY = 0;
 
-    Serial.println("Serial Txd is on pin: "+String(TX));
-    Serial.println("Serial Rxd is on pin: "+String(RX));
+int counter1 = 0;
+int counter2 = 0;
+long timer = 0;
+
+void setup() {
+  // Note the format for setting a serial port is as follows: Serial2.begin(baud-rate, protocol, RX pin, TX pin);
+  Serial.begin(115200);
+
+  Serial1.begin(9600, SERIAL_8N1, RXD1, TXD1);
+  Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
+
+  Serial.println("Serial Txd is on pin: " + String(TX));
+  Serial.println("Serial Rxd is on pin: " + String(RX));
+
+  Wire.begin();
+  mpu6050.begin();
+  mpu6050.calcGyroOffsets(true);
 }
 
-void loop() 
-{ 
-  delay(3000);
+void loop() {
 
-  for(int i = 0;i<8;i++)
-  {
-     Serial2.write(array[i]);
+  mpuread();
+  delay(1000);
+  for (int i = 0; i < 8; i++) {
+    Serial1.write(array[i]);
   }
-  for(int i = 0;i<8;i++)
-  {
-     Serial1.write(array[i]);
-  }  
- 
-  //Choose Serial1 or Serial2 as required
-  while (Serial2.available())
-   {
-    Serial.print((Serial2.read()), HEX);
-    Serial.print(" ");
-   }
-   Serial.println();
 
-while (Serial1.available())
-   {
-    Serial.print((Serial1.read()), HEX);
-    Serial.print(" ");
-   }
-   Serial.println();   
+  while (Serial1.available()) {
+    Lidar1[counter1] = Serial1.read();
+    //  Serial.print(Lidar1[counter1], HEX);
+    // Serial.print(" ");
+    counter1++;
+    if (counter1 > 8) counter1 = 0;
+  }
+  if ((abs(AngleX) < 30) && (abs(AngleY) < 30)) {
+    if ((Lidar1[0] == 1) | (Lidar1[1] == 3) | (Lidar1[2] == 4)) {
+      int Data1 = Lidar1[3] << 24 | Lidar1[4] << 16 | Lidar1[5] << 8 | Lidar1[6];
+      Serial.print("Lidar1(mm) ->  ");
+      Serial.print(Data1);
+    }
+  }
+  Serial.println();
+  //////////////////////////////////////////////////////////////////////////
+  for (int i = 0; i < 8; i++) {
+    Serial2.write(array[i]);
+  }
+  //Choose Serial1 or Serial2 as required
+  while (Serial2.available()) {
+    Lidar2[counter2] = Serial2.read();
+    //  Serial.print(Lidar2[counter2], HEX);
+    // Serial.print(" ");
+    counter2++;
+    if (counter2 > 8) counter2 = 0;
+  }
+  if ((abs(AngleX) < 30) && (abs(AngleY) < 30)) {
+    if ((Lidar2[0] == 1) | (Lidar2[1] == 3) | (Lidar2[2] == 4)) {
+      int Data2 = Lidar2[3] << 24 | Lidar2[4] << 16 | Lidar2[5] << 8 | Lidar2[6];
+      Serial.print("Lidar2(mm) ->  ");
+      Serial.print(Data2);
+    }
+  }
+  Serial.println();
+}
+
+void mpuread(void) {
+
+  mpu6050.update();
+  Serial.println("=======================================================");
+  Serial.print("AngleX : ");
+  AngleX = mpu6050.getAccAngleX();
+  Serial.print(AngleX);
+  Serial.print("\t AngleY : ");
+  AngleY = mpu6050.getAccAngleY();
+  Serial.println(AngleY);
+  Serial.println("=======================================================");
 }
