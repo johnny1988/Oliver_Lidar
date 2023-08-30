@@ -1,3 +1,10 @@
+/* Todo , add 4 bytes of data as a number from  array 3 to arry 6
+Normale Antwort: 0x01 0x03 0x04 0x00 0x00 0 xe0 0 xa10 x 72 0 x4b
+Hinweis (der Abstand in dieser Anweisung beträgt 4 Bytes, 0x00 0x00 0 xe0 0 xa1, und der Abstand ist 0 x0000e0a1, umgerechnet in 57505mm dezimal)
+
+use link or the description
+https://de.aliexpress.com/item/33035807395.html?gatewayAdapt=glo2deu
+*/
 /*
  * There are three serial ports on the ESP known as U0UXD, U1UXD and U2UXD.
  * 
