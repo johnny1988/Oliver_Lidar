@@ -14,13 +14,18 @@ https://de.aliexpress.com/item/33035807395.html?gatewayAdapt=glo2deu
  * 
 */
 //include <HardwareSerial.h> // ist bereits teil von Arduino IDE
+#include <MPU6050_tockn.h>
+#include <Wire.h>
 
+MPU6050 mpu6050(Wire);
 #define RXD1 27  // for loopback jumper these pins
 #define TXD1 26
 
 #define RXD2 16
 #define TXD2 17
  int array [] = {0x01, 0x03, 0x00, 0x0f, 0x00, 0x02, 0xf4, 0x08};
+
+long timer = 0;
 
 void setup() 
 {
@@ -32,10 +37,15 @@ void setup()
 
     Serial.println("Serial Txd is on pin: "+String(TX));
     Serial.println("Serial Rxd is on pin: "+String(RX));
+
+  Wire.begin();
+  mpu6050.begin();
+  mpu6050.calcGyroOffsets(true);
 }
 
 void loop() 
 { 
+ mpuread();
   delay(3000);
 
   for(int i = 0;i<8;i++)
@@ -61,4 +71,37 @@ while (Serial1.available())
     Serial.print(" ");
    }
    Serial.println();   
+}
+
+mpuread()
+{
+mpu6050.update();
+
+  if(millis() - timer > 1000){
+    
+    Serial.println("=======================================================");
+  //  Serial.print("temp : ");Serial.println(mpu6050.getTemp());
+  //  Serial.print("accX : ");Serial.print(mpu6050.getAccX());
+  //  Serial.print("\taccY : ");Serial.print(mpu6050.getAccY());
+ //   Serial.print("\taccZ : ");Serial.println(mpu6050.getAccZ());
+  
+ //   Serial.print("gyroX : ");Serial.print(mpu6050.getGyroX());
+ //   Serial.print("\tgyroY : ");Serial.print(mpu6050.getGyroY());
+ //   Serial.print("\tgyroZ : ");Serial.println(mpu6050.getGyroZ());
+  
+    Serial.print("accAngleX : ");Serial.print(mpu6050.getAccAngleX());
+    Serial.print("\taccAngleY : ");Serial.println(mpu6050.getAccAngleY());
+    Serial.println("=======================================================");
+    
+    Serial.print("gyroAngleX : ");Serial.print(mpu6050.getGyroAngleX());
+    Serial.print("\tgyroAngleY : ");Serial.print(mpu6050.getGyroAngleY());
+    Serial.print("\tgyroAngleZ : ");Serial.println(mpu6050.getGyroAngleZ());
+    
+   // Serial.print("angleX : ");Serial.print(mpu6050.getAngleX());
+   // Serial.print("\tangleY : ");Serial.print(mpu6050.getAngleY());
+  //  Serial.print("\tangleZ : ");Serial.println(mpu6050.getAngleZ());
+    Serial.println("=======================================================\n");
+    timer = millis();
+    
+  }
 }
