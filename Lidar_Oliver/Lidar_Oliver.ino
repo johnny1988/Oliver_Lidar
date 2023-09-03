@@ -27,6 +27,7 @@ int array[] = { 0x01, 0x03, 0x00, 0x0f, 0x00, 0x02, 0xf4, 0x08 };
 int Lidar1[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 int Lidar2[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
+<<<<<<< HEAD
 float AngleX = 0;
 float AngleY = 0;
 
@@ -43,13 +44,34 @@ void setup() {
 
   Serial.println("Serial Txd is on pin: " + String(TX));
   Serial.println("Serial Rxd is on pin: " + String(RX));
+=======
+long timer = 0;
+
+void setup() 
+{
+    // Note the format for setting a serial port is as follows: Serial2.begin(baud-rate, protocol, RX pin, TX pin);
+    Serial.begin(115200);
+    
+    Serial1.begin(9600, SERIAL_8N1, RXD1, TXD1);
+    Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
+
+    Serial.println("Serial Txd is on pin: "+String(TX));
+    Serial.println("Serial Rxd is on pin: "+String(RX));
+>>>>>>> 6b827643ac13c5933f2bf7aaa646c832e2114769
 
   Wire.begin();
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
 }
 
+<<<<<<< HEAD
 void loop() {
+=======
+void loop() 
+{ 
+ mpuread();
+  delay(3000);
+>>>>>>> 6b827643ac13c5933f2bf7aaa646c832e2114769
 
   mpuread();
   delay(1000);
@@ -105,4 +127,37 @@ void mpuread(void) {
   AngleY = mpu6050.getAccAngleY();
   Serial.println(AngleY);
   Serial.println("=======================================================");
+}
+
+mpuread()
+{
+mpu6050.update();
+
+  if(millis() - timer > 1000){
+    
+    Serial.println("=======================================================");
+  //  Serial.print("temp : ");Serial.println(mpu6050.getTemp());
+  //  Serial.print("accX : ");Serial.print(mpu6050.getAccX());
+  //  Serial.print("\taccY : ");Serial.print(mpu6050.getAccY());
+ //   Serial.print("\taccZ : ");Serial.println(mpu6050.getAccZ());
+  
+ //   Serial.print("gyroX : ");Serial.print(mpu6050.getGyroX());
+ //   Serial.print("\tgyroY : ");Serial.print(mpu6050.getGyroY());
+ //   Serial.print("\tgyroZ : ");Serial.println(mpu6050.getGyroZ());
+  
+    Serial.print("accAngleX : ");Serial.print(mpu6050.getAccAngleX());
+    Serial.print("\taccAngleY : ");Serial.println(mpu6050.getAccAngleY());
+    Serial.println("=======================================================");
+    
+    Serial.print("gyroAngleX : ");Serial.print(mpu6050.getGyroAngleX());
+    Serial.print("\tgyroAngleY : ");Serial.print(mpu6050.getGyroAngleY());
+    Serial.print("\tgyroAngleZ : ");Serial.println(mpu6050.getGyroAngleZ());
+    
+   // Serial.print("angleX : ");Serial.print(mpu6050.getAngleX());
+   // Serial.print("\tangleY : ");Serial.print(mpu6050.getAngleY());
+  //  Serial.print("\tangleZ : ");Serial.println(mpu6050.getAngleZ());
+    Serial.println("=======================================================\n");
+    timer = millis();
+    
+  }
 }
